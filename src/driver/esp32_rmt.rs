@@ -101,7 +101,7 @@ impl<'d> Ws2812Esp32RmtDriver<'d> {
         channel: impl Peripheral<P = C> + 'd,
         pin: impl Peripheral<P = impl OutputPin> + 'd,
     ) -> Result<Self, Ws2812Esp32RmtDriverError> {
-        let mut config = TransmitConfig::new().clock_divider(8);
+        let mut config = TransmitConfig::new().clock_divider(2);
 
         config.idle = Some(PinState::Low);
 
@@ -136,7 +136,14 @@ impl<'d> Ws2812Esp32RmtDriver<'d> {
         T: Iterator<Item = u8> + Send + 'b,
     {
         let signal = self.encoder.encode_iter(pixel_sequence);
-        self.tx.start_iter_blocking(signal)?;
+        let mut x = esp_idf_hal::rmt::FixedLengthSignal::<255>::new();
+
+        for (i, r) in signal.enumerate() {
+            x.set(i, r.as_slice()).unwrap();
+        }
+
+        self.tx.start_blocking(&x)?;
+
         Ok(())
     }
 
