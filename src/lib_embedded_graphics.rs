@@ -35,7 +35,11 @@ impl<const W: usize, const H: usize> LedPixelShape for LedPixelMatrix<W, H> {
 
     fn pixel_index(point: Point) -> Option<usize> {
         if (0..W as i32).contains(&point.x) && (0..H as i32).contains(&point.y) {
-            Some((point.x + point.y * W as i32) as usize)
+            if point.y % 2 == 0 {
+                Some((point.x + point.y * W as i32) as usize)
+            } else {
+                Some(((31 - point.x) + point.y * W as i32) as usize)
+            }
         } else {
             None
         }
