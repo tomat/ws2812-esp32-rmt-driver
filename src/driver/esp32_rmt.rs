@@ -1,10 +1,11 @@
 use esp_idf_hal::gpio::OutputPin;
 use esp_idf_hal::peripheral::Peripheral;
-use esp_idf_hal::rmt::config::TransmitConfig;
+use esp_idf_hal::rmt::config::{CarrierConfig, TransmitConfig};
 use esp_idf_hal::rmt::{FixedLengthSignal, PinState, Pulse, RmtChannel, Signal, TxRmtDriver, Symbol};
 use esp_idf_hal::units::Hertz;
 use esp_idf_sys::{rmt_item32_t, EspError};
 use std::time::Duration;
+use esp_idf_hal::prelude::FromValueType;
 
 /// T0H duration time (0 code, high voltage time)
 const WS2812_T0H_NS: Duration = Duration::from_nanos(400);
@@ -109,7 +110,9 @@ impl<'d> Ws2812Esp32RmtDriver<'d> {
         channel: impl Peripheral<P = C> + 'd,
         pin: impl Peripheral<P = impl OutputPin> + 'd,
     ) -> Result<Self, Ws2812Esp32RmtDriverError> {
-        let config = TransmitConfig::new().clock_divider(1);
+        let mut config = TransmitConfig::new().clock_divider(1);
+        config.carrier = Some(CarrierConfig::default().frequency(Hertz::from(800.kHz())));
+
         let tx = TxRmtDriver::new(channel, pin, &config)?;
 
         let clock_hz = tx.counter_clock()?;
