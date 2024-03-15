@@ -73,6 +73,25 @@ impl Ws2812Esp32RmtItemEncoder {
             })
         })
     }
+
+    #[inline]
+    fn encode_iter_pulse<'a, 'b, T>(&'a self, src: T) -> impl Iterator<Item = (Pulse, Pulse)> + Send + 'a
+        where
+            'b: 'a,
+            T: Iterator<Item = u8> + Send + 'b,
+    {
+        src.flat_map(move |v| {
+            (0..(u8::BITS as usize)).map(move |i| {
+                if v & (1 << (7 - i)) != 0 {
+                    (self.bit1.0, self.bit1.1)
+                    // self.bit1
+                } else {
+                    (self.bit0.0, self.bit0.1)
+                    // self.bit0
+                }
+            })
+        })
+    }
 }
 
 /// WS2812 ESP32 RMT Driver error.
@@ -135,11 +154,11 @@ impl<'d> Ws2812Esp32RmtDriver<'d> {
         'b: 'a,
         T: Iterator<Item = u8> + Send + 'b,
     {
-        let signal = self.encoder.encode_iter(pixel_sequence);
+        let signal = self.encoder.encode_iter_pulse(pixel_sequence);
         let mut x = esp_idf_hal::rmt::FixedLengthSignal::<255>::new();
 
         for (i, r) in signal.enumerate() {
-            x.set(i, r.as_slice()).unwrap();
+            x.set(i, &r).unwrap();
         }
 
         self.tx.start_blocking(&x)?;
