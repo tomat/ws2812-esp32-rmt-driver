@@ -101,7 +101,7 @@ impl<'d> Ws2812Esp32RmtDriver<'d> {
         channel: impl Peripheral<P = C> + 'd,
         pin: impl Peripheral<P = impl OutputPin> + 'd,
     ) -> Result<Self, Ws2812Esp32RmtDriverError> {
-        let mut config = TransmitConfig::new().clock_divider(4);
+        let mut config = TransmitConfig::new().clock_divider(1);
 
         config.idle = Some(PinState::Low);
 
