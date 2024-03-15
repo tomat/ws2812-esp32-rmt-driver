@@ -43,15 +43,6 @@ impl Ws2812Esp32RmtItemEncoder {
             Pulse::new_with_duration(clock_hz, PinState::Low, &WS2812_T1L_NS)?,
         );
 
-        let (bit0, bit1) = {
-            let mut bit0_sig = FixedLengthSignal::<1>::new();
-            let mut bit1_sig = FixedLengthSignal::<1>::new();
-            bit0_sig.set(0, &(t0h, t0l))?;
-            bit1_sig.set(0, &(t1h, t1l))?;
-
-            (bit0_sig.as_slice()[0], bit1_sig.as_slice()[0])
-        };
-
         Ok(Self { bit0: (t0h, t0l), bit1: (t1h, t1l) })
     }
 
@@ -110,8 +101,9 @@ impl<'d> Ws2812Esp32RmtDriver<'d> {
         channel: impl Peripheral<P = C> + 'd,
         pin: impl Peripheral<P = impl OutputPin> + 'd,
     ) -> Result<Self, Ws2812Esp32RmtDriverError> {
-        let mut config = TransmitConfig::new().clock_divider(1);
-        config.carrier = Some(CarrierConfig::default().frequency(Hertz::from(800.kHz())));
+        let mut config = TransmitConfig::new().clock_divider(2);
+
+        config.idle = Some(PinState::Low);
 
         let tx = TxRmtDriver::new(channel, pin, &config)?;
 
