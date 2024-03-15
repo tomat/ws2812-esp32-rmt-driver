@@ -8,13 +8,13 @@ use std::time::Duration;
 use esp_idf_hal::prelude::FromValueType;
 
 /// T0H duration time (0 code, high voltage time)
-const WS2812_T0H_NS: Duration = Duration::from_nanos(400);
+const WS2812_T0H_NS: Duration = Duration::from_nanos(350);
 /// T0L duration time (0 code, low voltage time)
-const WS2812_T0L_NS: Duration = Duration::from_nanos(850);
+const WS2812_T0L_NS: Duration = Duration::from_nanos(800);
 /// T1H duration time (1 code, high voltage time)
-const WS2812_T1H_NS: Duration = Duration::from_nanos(800);
+const WS2812_T1H_NS: Duration = Duration::from_nanos(700);
 /// T1L duration time (1 code, low voltage time)
-const WS2812_T1L_NS: Duration = Duration::from_nanos(450);
+const WS2812_T1L_NS: Duration = Duration::from_nanos(600);
 
 /// Converter to a sequence of RMT items.
 #[repr(C)]
