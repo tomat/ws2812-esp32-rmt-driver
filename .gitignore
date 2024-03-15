@@ -180,3 +180,5 @@ tags
 .history
 
 # End of https://www.gitignore.io/api/vim,emacs,intellij,visualstudiocode,rust
+
+.DS_Store
