@@ -157,9 +157,7 @@ impl<'d> Ws2812Esp32RmtDriver<'d> {
         let signal = self.encoder.encode_iter_pulse(pixel_sequence);
         let mut x = esp_idf_hal::rmt::VariableLengthSignal::new();
 
-        for r in signal {
-            x.push(&r).unwrap();
-        }
+        x.push(signal).unwrap();
 
         self.tx.start_blocking(&x)?;
 
